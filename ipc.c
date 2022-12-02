@@ -46,11 +46,38 @@ int main() {
 //        printf("%s", line);
     }
 
-    printf("%ld\n", a[number_count-1]);
 
-    long result = recursion(a, 0, number_count-1);
+    int numProcess = 3;
+
+    for (int childP = 0; childP < numProcess; childP++)
+    {
+        int child = fork();
+        if (child < 0)
+        {
+            fprintf(stderr, "%s: failed to fork child %d\n", arg0, childP + 1);
+            exit(EXIT_FAILURE);
+        }
+        if (child == 0)
+        {
+            // close(fd[0]);
+            // int childSum = 0;
+            // int start = childP * numPerProcess;
+            // int stop = start + numPerProcess;
+            printf("Child Process No [%d] PID [%d], PPID: : %d\n", childP, getpid(), getppid());
+            // if (write(fd[1], &childSum, sizeof(childSum)) != sizeof(childSum))
+            // {
+            //     fprintf(stderr, "Child Process No [%d] PID [%d] failed to write to the pipe\n",
+            //             childP, getpid());
+            //     exit(EXIT_FAILURE);
+            // }
+            // close(fd[1]);
+            exit(0);
+        }
+    }
+
+    // long result = recursion(a, 0, number_count-1);
     
-    printf("%ld\n", result);
+    // printf("%ld\n", result);
 
     fclose(fp);
     if (line)
