@@ -55,6 +55,10 @@ int main() {
 
     int numProcess = 8;
     int sizePerProcess = number_count / 8
+    int fd[2];
+
+    pipe(fd);
+
 
     for (int childP = 0; childP < numProcess; childP++)
     {
@@ -63,23 +67,31 @@ int main() {
         {
             exit(EXIT_FAILURE);
         }
-        if (child == 0)
-        {
-            // close(fd[0]);
-            // int childSum = 0;
+        else if (child > 0)
+        {   
+            close(fd[0]);
+
             int start = childP * sizePerProcess;
             int end = min(start + sizePerProcess - 1, number_count - 1)
-            long result = recursion(a, start, end);
-            // int stop = start + numPerProcess;
+            int pointers[2] = {start, end};
+
+            // send the value on the write-descriptor.
+            write(fd[1], &pointers, sizeof(pointers));
+            printf("Parent(%d) Send Value: (%d, %d)\n", getpid(), pointers[0], pointers[1]);
+
+            // close the write descriptor
+            close(fd[1]);
+
+        }
+        else if (child == 0)
+        {
+            close(fd[1]);
+            int pointers[2];
+            read(fd[0], &pointers, sizeof(pointers));
+            long result = recursion(a, pointers[0], pointers[1]);
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
-            printf("Start: [%d], End: [%d], Result:[%ld]\n", start, end, result)
-            // if (write(fd[1], &childSum, sizeof(childSum)) != sizeof(childSum))
-            // {
-            //     fprintf(stderr, "Child Process No [%d] PID [%d] failed to write to the pipe\n",
-            //             childP, getpid());
-            //     exit(EXIT_FAILURE);
-            // }
-            // close(fd[1]);
+            printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result)
+            close(fd[0]);
             exit(0);
         }
     }
@@ -87,7 +99,8 @@ int main() {
     // long result = recursion(a, 0, number_count-1);
     
     // printf("%ld\n", result);
-    sleep(5);
+    wait(NULL);
+    // sleep(5);
     fclose(fp);
     if (line)
         free(line);
