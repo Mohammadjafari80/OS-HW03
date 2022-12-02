@@ -24,9 +24,6 @@ int min(int x, int y)
 
 
 int main() {
-    // long x = 8;
-    // long y = 4;
-    // printf("%ld", fun(x, y));
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
@@ -51,14 +48,13 @@ int main() {
 
     while ((readline = getline(&line, &len, fp)) != -1) {
         a[counter ++] = strtol(line, NULL, 10);
-//        printf("%s", line);
     }
 
     fclose(fp);
 
 
-    int numProcess = 8;
-    int sizePerProcess = number_count / 8;
+    int numProcess = 32;
+    int sizePerProcess = number_count / numProcess + 1;
     int fd[2];
 
 
@@ -92,18 +88,8 @@ int main() {
 
             // send the value on the write-descriptor.
             write(fd[1], &pointers, sizeof(pointers));
-            printf("Parent(%d) Send Value: (%d, %d)\n", getpid(), pointers[0], pointers[1]);
 
-            // close the write descriptor
             close(fd[1]);
-
-	    //
-	    long result; 
-	    int fifo_file = open(myfifo, O_RDONLY);
-	    read(fifo_file, &result, sizeof(result));
-	    printf("RESULT: %ld\n",result); 
-	    close(fifo_file);
-
         }
         else if (child == 0)
         {
@@ -113,7 +99,6 @@ int main() {
             long result = recursion(a, pointers[0], pointers[1]);
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
             printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result);
-            printf("Size: %lu\n", sizeof(result));
             close(fd[0]);
             int fifo_file = open(myfifo, O_WRONLY);
             write(fifo_file, &result, sizeof(result));
@@ -122,27 +107,21 @@ int main() {
         }
     }
 
-    // long result = recursion(a, 0, number_count-1);
-    
-    // printf("%ld\n", result);
-    printf("DICK");
+    long subResults[numProcess];
+    for (int i=0 ; i < numProcess; i++){
+	int fifoFile = open(myfifo, O_RDONLY);
+	long result;
+	read(fifoFile, &result, sizeof(result));
+	subResults[i] = result;
+	close(fifoFile);
+    }
+
     wait(NULL);
-
-    sleep(1);
-
-    printf("KIR");
     //int fifo_file = open(myfifo, O_RDONLY);
-
-    //long result;
-
-    //read(fifo_file, &result, sizeof(result));
-
-  //  printf("RESULTS %ld\n", result);
-
-//    close(fifo_file);
-
-    if (line)
-        free(line);
-
+    sleep(2);
+    long result;
+    result = recursion(subResults, 0, numProcess-1);
+    printf("THE FINAL RESULTS is:\n%ld\n", result);
+    unlink(myfifo);
     exit(0);
 }
