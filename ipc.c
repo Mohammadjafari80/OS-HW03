@@ -6,6 +6,15 @@
 
 extern long fun(long a, long b);
  
+long recursion(long v[], int left, int right) {
+
+    if (right - left < 1)
+        return fun(v[left], v[right]);
+
+    middle = (left + right)/2
+    return recursion(recursion(v, left, middle), recursion(v, middle+1, right));
+}
+
 int main() {
     // long x = 8;
     // long y = 4;
@@ -38,7 +47,11 @@ int main() {
     }
 
     printf("%ld\n", a[number_count-1]);
+
+    result = recursion(a, 0, number_count-1)
     
+    printf("%ld\n", result);
+
     fclose(fp);
     if (line)
         free(line);
