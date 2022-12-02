@@ -52,10 +52,22 @@ int main() {
 //        printf("%s", line);
     }
 
+    fclose(fp);
+
 
     int numProcess = 8;
     int sizePerProcess = number_count / 8;
     int fd[2];
+
+
+    // FIFO file path
+    char * myfifo = "/tmp/myfifo";
+
+    // Creating the named file(FIFO)
+    // mkfifo(<pathname>, <permission>)
+    mkfifo(myfifo, 0666);
+
+
 
     pipe(fd);
 
@@ -92,7 +104,11 @@ int main() {
             long result = recursion(a, pointers[0], pointers[1]);
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
             printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result);
+            printf('Size: %d\n', sizeof(result));
             close(fd[0]);
+            fifo_file = open(myfifo, O_APPEND);
+            write(fifo_file, &result, sizeof(result));
+            close(fifo_file);
             exit(0);
         }
     }
@@ -101,8 +117,17 @@ int main() {
     
     // printf("%ld\n", result);
     wait(NULL);
-    // sleep(5);
-    fclose(fp);
+    sleep(1)
+
+    fp = fopen(myfifo, "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    while ((readline = getline(&line, &len, fp)) != -1) {
+        // number_count ++;
+       printf("%s", line);
+    }
+
     if (line)
         free(line);
 }
