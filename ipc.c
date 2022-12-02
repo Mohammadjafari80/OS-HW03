@@ -17,7 +17,7 @@ long recursion(long v[], int left, int right) {
 
 int min(int x, int y)
 {
-  return (x < y) ? x : y
+  return (x < y) ? x : y;
 }
 
 
@@ -54,11 +54,15 @@ int main() {
 
 
     int numProcess = 8;
+<<<<<<< HEAD
     int sizePerProcess = number_count / 8
     int fd[2];
 
     pipe(fd);
 
+=======
+    int sizePerProcess = number_count / 8;
+>>>>>>> 8906e5cd6d1eea93161789724c0c57f2f88fe064
 
     for (int childP = 0; childP < numProcess; childP++)
     {
@@ -72,6 +76,7 @@ int main() {
             close(fd[0]);
 
             int start = childP * sizePerProcess;
+<<<<<<< HEAD
             int end = min(start + sizePerProcess - 1, number_count - 1)
             int pointers[2] = {start, end};
 
@@ -92,6 +97,20 @@ int main() {
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
             printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result)
             close(fd[0]);
+=======
+            int end = min(start + sizePerProcess - 1, number_count - 1);
+            long result = recursion(a, start, end);
+            // int stop = start + numPerProcess;
+            printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
+            printf("Start: [%d], End: [%d], Result:[%ld]\n", start, end, result);
+            // if (write(fd[1], &childSum, sizeof(childSum)) != sizeof(childSum))
+            // {
+            //     fprintf(stderr, "Child Process No [%d] PID [%d] failed to write to the pipe\n",
+            //             childP, getpid());
+            //     exit(EXIT_FAILURE);
+            // }
+            // close(fd[1]);
+>>>>>>> 8906e5cd6d1eea93161789724c0c57f2f88fe064
             exit(0);
         }
     }
