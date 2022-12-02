@@ -33,11 +33,11 @@ int main() {
     int counter = 0;
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        a[number_count ++] = strtol(line, NULL, 10);;;
+        a[counter ++] = strtol(line, NULL, 10);
 //        printf("%s", line);
     }
 
-    printf("%ld\n", a[0])
+    printf("%ld\n", a[number_count-1]);
     
     fclose(fp);
     if (line)
