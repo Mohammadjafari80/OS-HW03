@@ -54,17 +54,19 @@ int main() {
 
     fclose(fp);
 
-    int numProcess = 32;
+    int numProcess = 8;
+    printf("Number of Processes: %d\n", numProcess);
     int sizePerProcess = numberCount / numProcess + 1;
 
     char * myfifo = "/tmp/myfifo";
     mkfifo(myfifo, 0666);
     
-    int fd[2];
-    pipe(fd);
+    int fd[2 * numProcess];
+
 
     for (int childP = 0; childP < numProcess; childP++)
     {
+	pipe(&fd[2*childP]);
         int child = fork();
         if (child < 0)
         {
@@ -72,25 +74,25 @@ int main() {
         }
         else if (child > 0)
         {   
-            close(fd[0]);
+            close(fd[2 * childP]);
 
             int start = childP * sizePerProcess;
             int end = min(start + sizePerProcess - 1, numberCount - 1);
             int pointers[2] = {start, end};
+            write(fd[2 * childP + 1], &pointers, sizeof(pointers));
 
-            write(fd[1], &pointers, sizeof(pointers));
-
-            close(fd[1]);
+            close(fd[2 * childP + 1]);
         }
         else if (child == 0)
         {
-            close(fd[1]);
+            close(fd[2 * childP + 1]);
             int pointers[2];
-            read(fd[0], &pointers, sizeof(pointers));
+            read(fd[2 * childP], &pointers, sizeof(pointers));
             long result = recursion(a, pointers[0], pointers[1]);
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
-            printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result);
-            close(fd[0]);
+            printf("Start: [%6d], End: [%6d], Result:[%ld]\n", pointers[0], pointers[1], result);
+            sleep(0.2);
+	    close(fd[2 * childP]);
             int fifoFile = open(myfifo, O_WRONLY);
             write(fifoFile, &result, sizeof(result));
             close(fifoFile);
@@ -110,7 +112,6 @@ int main() {
 
     wait(NULL);
     unlink(myfifo);
-    sleep(5);
 
     long result;
     result = recursion(subResults, 0, numProcess-1);
