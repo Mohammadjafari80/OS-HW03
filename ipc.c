@@ -47,14 +47,13 @@ int main() {
     }
 
 
-    int numProcess = 3;
+    int numProcess = 8;
 
     for (int childP = 0; childP < numProcess; childP++)
     {
         int child = fork();
         if (child < 0)
         {
-            fprintf(stderr, "%s: failed to fork child %d\n", arg0, childP + 1);
             exit(EXIT_FAILURE);
         }
         if (child == 0)
@@ -78,7 +77,7 @@ int main() {
     // long result = recursion(a, 0, number_count-1);
     
     // printf("%ld\n", result);
-
+    sleep(5);
     fclose(fp);
     if (line)
         free(line);
