@@ -28,14 +28,14 @@ int main() {
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
-    ssize_t read;
+    ssize_t readline;
     int number_count = 0;
 
     fp = fopen("./Practical_Q_1numbers.txt", "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
 
-    while ((read = getline(&line, &len, fp)) != -1) {
+    while ((readline = getline(&line, &len, fp)) != -1) {
         number_count ++;
 //        printf("%s", line);
     }
@@ -47,14 +47,14 @@ int main() {
     long a[number_count];
     int counter = 0;
 
-    while ((read = getline(&line, &len, fp)) != -1) {
+    while ((readline = getline(&line, &len, fp)) != -1) {
         a[counter ++] = strtol(line, NULL, 10);
 //        printf("%s", line);
     }
 
 
     int numProcess = 8;
-    int sizePerProcess = number_count / 8
+    int sizePerProcess = number_count / 8;
     int fd[2];
 
     pipe(fd);
@@ -73,7 +73,7 @@ int main() {
             close(fd[0]);
 
             int start = childP * sizePerProcess;
-            int end = min(start + sizePerProcess - 1, number_count - 1)
+            int end = min(start + sizePerProcess - 1, number_count - 1);
             int pointers[2] = {start, end};
 
             // send the value on the write-descriptor.
@@ -91,7 +91,7 @@ int main() {
             read(fd[0], &pointers, sizeof(pointers));
             long result = recursion(a, pointers[0], pointers[1]);
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
-            printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result)
+            printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result);
             close(fd[0]);
             exit(0);
         }
