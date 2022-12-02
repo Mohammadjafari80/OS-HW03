@@ -15,6 +15,12 @@ long recursion(long v[], int left, int right) {
     return fun(recursion(v, left, middle), recursion(v, middle+1, right));
 }
 
+int min(int x, int y)
+{
+  return (x < y) ? x : y
+}
+
+
 int main() {
     // long x = 8;
     // long y = 4;
@@ -48,6 +54,7 @@ int main() {
 
 
     int numProcess = 8;
+    int sizePerProcess = number_count / 8
 
     for (int childP = 0; childP < numProcess; childP++)
     {
@@ -60,9 +67,12 @@ int main() {
         {
             // close(fd[0]);
             // int childSum = 0;
-            // int start = childP * numPerProcess;
+            int start = childP * sizePerProcess;
+            int end = min(start + sizePerProcess - 1, number_count - 1)
+            long result = recursion(a, start, end);
             // int stop = start + numPerProcess;
-            printf("Child Process No [%d] PID [%d], PPID: : %d\n", childP, getpid(), getppid());
+            printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
+            printf("Start: [%d], End: [%d], Result:[%ld]\n", start, end, result)
             // if (write(fd[1], &childSum, sizeof(childSum)) != sizeof(childSum))
             // {
             //     fprintf(stderr, "Child Process No [%d] PID [%d] failed to write to the pipe\n",
