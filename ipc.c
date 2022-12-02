@@ -14,15 +14,18 @@ int main() {
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
+    int counter = 0;
 
     fp = fopen("./Practical_Q_1numbers.txt", "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        printf("Retrieved line of length %zu:\n", read);
-        printf("%s", line);
+        counter ++;
+//        printf("%s", line);
     }
+
+    printf("%d", counter);
 
     fclose(fp);
     if (line)
