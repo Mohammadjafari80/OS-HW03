@@ -1,4 +1,6 @@
 #include <sys/wait.h> /* wait */
+#include <sys/stat.h>
+#include <sys/fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>   /* exit functions */
 #include <unistd.h>   /* read, write, pipe, _exit */
@@ -95,6 +97,13 @@ int main() {
             // close the write descriptor
             close(fd[1]);
 
+	    //
+	    long result; 
+	    int fifo_file = open(myfifo, O_RDONLY);
+	    read(fifo_file, &result, sizeof(result));
+	    printf("RESULT: %ld\n",result); 
+	    close(fifo_file);
+
         }
         else if (child == 0)
         {
@@ -104,9 +113,9 @@ int main() {
             long result = recursion(a, pointers[0], pointers[1]);
             printf("Child Process No [%d], PID [%d], PPID: : [%d], \n", childP, getpid(), getppid());
             printf("Start: [%d], End: [%d], Result:[%ld]\n", pointers[0], pointers[1], result);
-            printf('Size: %d\n', sizeof(result));
+            printf("Size: %lu\n", sizeof(result));
             close(fd[0]);
-            fifo_file = open(myfifo, O_APPEND);
+            int fifo_file = open(myfifo, O_WRONLY);
             write(fifo_file, &result, sizeof(result));
             close(fifo_file);
             exit(0);
@@ -116,18 +125,24 @@ int main() {
     // long result = recursion(a, 0, number_count-1);
     
     // printf("%ld\n", result);
+    printf("DICK");
     wait(NULL);
-    sleep(1)
 
-    fp = fopen(myfifo, "r");
-    if (fp == NULL)
-        exit(EXIT_FAILURE);
+    sleep(1);
 
-    while ((readline = getline(&line, &len, fp)) != -1) {
-        // number_count ++;
-       printf("%s", line);
-    }
+    printf("KIR");
+    //int fifo_file = open(myfifo, O_RDONLY);
+
+    //long result;
+
+    //read(fifo_file, &result, sizeof(result));
+
+  //  printf("RESULTS %ld\n", result);
+
+//    close(fifo_file);
 
     if (line)
         free(line);
+
+    exit(0);
 }
